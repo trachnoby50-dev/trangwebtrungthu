@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Đèn kéo quân — Hiệu ứng quay 3D</title>
+    <style>
+      :root {
+        --size: 420px;
+        --depth: 220px;
+        --speed: 18s;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+        background: linear-gradient(180deg, #0b2540, #071021);
+        color: #fff;
+        font-family: Inter, system-ui, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      }
+
+      .scene {
+        width: calc(var(--size));
+        height: calc(var(--size));
+        perspective: 1200px;
+      }
+      .lantern {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transform-style: preserve-3d;
+      }
+
+      /* spinner is the rotating group */
+      .spinner {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        left: 0;
+        top: 0;
+        transform-style: preserve-3d;
+        animation: spin var(--speed) linear infinite;
+      }
+      .lantern.paused .spinner {
+        animation-play-state: paused;
+      }
+
+      @keyframes spin {
+        from {
+          transform: rotateY(0deg);
+        }
+        to {
+          transform: rotateY(360deg);
+        }
+      }
+
+      /* 6 faces of the lantern */
+      .face {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        overflow: hidden;
+        backface-visibility: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      .face img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      /* position each face around Y axis */
+      .f1 {
+        transform: rotateY(0deg) translateZ(var(--depth));
+      }
+      .f2 {
+        transform: rotateY(60deg) translateZ(var(--depth));
+      }
+      .f3 {
+        transform: rotateY(120deg) translateZ(var(--depth));
+      }
+      .f4 {
+        transform: rotateY(180deg) translateZ(var(--depth));
+      }
+      .f5 {
+        transform: rotateY(240deg) translateZ(var(--depth));
+      }
+      .f6 {
+        transform: rotateY(300deg) translateZ(var(--depth));
+      }
+
+      /* small decorative top handle */
+      .top-handle {
+        position: absolute;
+        left: 50%;
+        top: -36px;
+        transform: translateX(-50%);
+        width: 10px;
+        height: 40px;
+        background: linear-gradient(#ffd27a, #ff8a00);
+        border-radius: 6px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+      }
+
+      /* caption & controls */
+      .ui {
+        position: fixed;
+        left: 20px;
+        bottom: 20px;
+        background: rgba(255, 255, 255, 0.04);
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 14px;
+      }
+      .ui small {
+        display: block;
+        opacity: 0.8;
+      }
+      .btn {
+        margin-top: 8px;
+        padding: 6px 10px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        cursor: pointer;
+      }
+      .btn:active {
+        transform: translateY(1px);
+      }
+
+      /* make it responsive: smaller on mobile */
+      @media (max-width: 520px) {
+        :root {
+          --size: 300px;
+          --depth: 150px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="scene" aria-hidden="false">
+      <div class="lantern" id="lantern">
+        <div class="top-handle"></div>
+        <div class="spinner" id="spinner">
+          <div class="face f1" data-face="1">
+            <img src="images/IMG_3718.jpg" alt="Mặt 1" />
+          </div>
+          <div class="face f2" data-face="2">
+            <img
+              src="images/z7173434690668_170915bc5e999e94cd1be86cadaa4e2c.jpg"
+              alt="Mặt 2"
+            />
+          </div>
+          <div class="face f3" data-face="3">
+            <img
+              src="images/z7176247421741_4fe5f5141d760d2d9d5394ff766d6d9e.jpg"
+              alt="Mặt 3 - Ảnh chân dung của bạn (bắt buộc)"
+            />
+          </div>
+          <div class="face f4" data-face="4">
+            <img
+              src="images/z7176250642974_f49e6fa7c65912b377badb5783302095 - Copy.jpg"
+              alt="Mặt 4"
+            />
+          </div>
+          <div class="face f5" data-face="5">
+            <img
+              src="images/z7176250642974_f49e6fa7c65912b377badb5783302095.jpg"
+              alt="Mặt 5"
+            />
+          </div>
+          <div class="face f6" data-face="6">
+            <img
+              src="images/z7176250642974_f49e6fa7c65912b377badb5783302095.jpg"
+              alt="Mặt 6"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ui">
+      <strong>Đèn kéo quân (Rằm Trung thu)</strong>
+      <small
+        >Rê chuột vào bất kỳ mặt ảnh nào để tạm dừng — rê ra để tiếp tục.</small
+      >
+      <button class="btn" id="toggle">Tạm dừng / Tiếp tục</button>
+    </div>
+
+    <script>
+      // Elements
+      const lantern = document.getElementById("lantern");
+      const spinner = document.getElementById("spinner");
+      const faces = document.querySelectorAll(".face");
+      const toggleBtn = document.getElementById("toggle");
+
+      // When mouse enters any face -> pause. When leaves -> resume.
+      faces.forEach((face) => {
+        face.addEventListener("pointerenter", () =>
+          lantern.classList.add("paused")
+        );
+        face.addEventListener("pointerleave", () =>
+          lantern.classList.remove("paused")
+        );
+
+        // also support touch: tap toggles pause for convenience on mobile
+        face.addEventListener("click", (e) => {
+          lantern.classList.toggle("paused");
+        });
+      });
+
+      // button to toggle
+      toggleBtn.addEventListener("click", () =>
+        lantern.classList.toggle("paused")
+      );
+
+      // Accessibility: pause when user focuses with keyboard
+      faces.forEach((face) => {
+        face.setAttribute("tabindex", "0");
+        face.addEventListener("focus", () => lantern.classList.add("paused"));
+        face.addEventListener("blur", () => lantern.classList.remove("paused"));
+      });
+
+      // Helpful: allow speed control with +/- keys
+      let speed =
+        parseFloat(
+          getComputedStyle(document.documentElement).getPropertyValue("--speed")
+        ) || 18;
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "+" || e.key === "=") {
+          speed = Math.max(2, speed - 2);
+          document.documentElement.style.setProperty("--speed", speed + "s");
+        }
+        if (e.key === "-") {
+          speed = Math.min(120, speed + 2);
+          document.documentElement.style.setProperty("--speed", speed + "s");
+        }
+      });
+
+      // Notes for developer in console
+      console.log(
+        "Đèn kéo quân sẵn sàng. Thay images/face3.jpg bằng ảnh chân dung của bạn."
+      );
+    </script>
+
+    <!--
+    HƯỚNG DẪN SỬ DỤNG NGẮN:
+    - Thêm một thư mục "images" cùng cấp với file này rồi đặt 6 ảnh: face1.jpg ... face6.jpg.
+    - Bắt buộc: face3.jpg là ảnh chân dung của bạn.
+    - Mở file den-keo-quan.html trong trình duyệt để xem.
+    - Muốn dừng quay tạm thời: rê chuột vào mặt bất kỳ hoặc nhấn nút "Tạm dừng / Tiếp tục".
+
+    ĐĂNG LÊN GITHUB PAGES:
+    1) Tạo repo mới trên GitHub (ví dụ: den-keo-quan).
+    2) git init; git add .; git commit -m "init"; git branch -M main
+       git remote add origin https://github.com/<tên-của-bạn>/<repo>.git
+       git push -u origin main
+    3) Vào Settings -> Pages -> Chọn branch main / folder: root -> Save.
+    4) Trang sẽ hoạt động tại: https://<tên-của-bạn>.github.io/<repo>/ (hoặc https://<tên-của-bạn>.github.io nếu repo là <tên-của-bạn>.github.io)
+
+    CHỤP MÀN HÌNH:
+    - Windows: Snipping Tool hoặc PrtScn.
+    - macOS: Cmd+Shift+4.
+    - Lưu ảnh screenshot và push vào repo (ví dụ folder screenshots/) cùng với code.
+  --></body>
+</html>
